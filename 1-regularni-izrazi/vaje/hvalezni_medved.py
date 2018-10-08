@@ -1,3 +1,4 @@
+import re
 ###############################################################################
 # Hvaležni medved
 #
@@ -9,7 +10,7 @@
 test_text = """Gori nekje v gorah, ne ve se več, ali je bilo pri Macigoju ali
 Naravniku, je šivala gospodinja v senci pod drevesom in zibala otroka. Naenkrat
 prilomasti - pa prej ni ničesar opazila - medved in ji moli taco, v kateri je
-tičal velik, debel trn. Žena se je prestrašila, a medved le milo in pohlevno
+tičal velik, debel trn. Žena se je pr+strašila, a medved le milo in pohlevno
 godrnja. Zato se žena ojunači in mu izdere trn iz tace. Mrcina kosmata pa zvrne
 zibel, jo pobaše in oddide. Čez nekaj časa pa ji zopet prinese zibel, a zvhano
 napolnjeno s sladkimi hruškami . Postavil jo je na tla pred začudeno mater in
@@ -27,6 +28,14 @@ medved. Zvrhano zibelko sladkih hrušk mi je prinesel za en sam izdrt trn"."""
 ###############################################################################
 
 
+def find_words(text, str):
+    list = re.findall(r'\w*'+str+r'\w*', text)
+    words = set()
+    for word in list:
+        words.add(word)
+    return words
+
+
 ###############################################################################
 # 2) Sestavite funkcijo [find_prefix], ki vrne množico vseh besed, ki se
 #    pojavijo v nizu in imajo dano predpono.
@@ -36,12 +45,20 @@ medved. Zvrhano zibelko sladkih hrušk mi je prinesel za en sam izdrt trn"."""
 ###############################################################################
 
 
+def find_prefix(text, prefix):
+    list = re.findall(r'\b'+prefix+r'\w*', text)
+    words = set()
+    for word in list:
+        words.add(word)
+    return words
+
+
 ###############################################################################
 # 3) Sestavite funkcijo [find_suffix], ki vrne množico vseh besed, ki se
 #    pojavijo v nizu in imajo dano pripono.
 #
 # >>> find_suffix(test_text, 'la')
-# {'zibala', 'razveselila', 'prestrašila', 'šivala', 'opazila', 'tla'}
+# {'zibala', 'razveselila', 'pr+strašila', 'šivala', 'opazila', 'tla'}
 ###############################################################################
 
 
