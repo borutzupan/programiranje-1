@@ -10,7 +10,7 @@ import re
 test_text = """Gori nekje v gorah, ne ve se več, ali je bilo pri Macigoju ali
 Naravniku, je šivala gospodinja v senci pod drevesom in zibala otroka. Naenkrat
 prilomasti - pa prej ni ničesar opazila - medved in ji moli taco, v kateri je
-tičal velik, debel trn. Žena se je pr+strašila, a medved le milo in pohlevno
+tičal velik, debel trn. Žena se je prestrašila, a medved le milo in pohlevno
 godrnja. Zato se žena ojunači in mu izdere trn iz tace. Mrcina kosmata pa zvrne
 zibel, jo pobaše in oddide. Čez nekaj časa pa ji zopet prinese zibel, a zvhano
 napolnjeno s sladkimi hruškami . Postavil jo je na tla pred začudeno mater in
@@ -60,6 +60,14 @@ def find_prefix(text, prefix):
 # >>> find_suffix(test_text, 'la')
 # {'zibala', 'razveselila', 'pr+strašila', 'šivala', 'opazila', 'tla'}
 ###############################################################################
+
+
+def find_suffix(text, suffix):
+    list = re.findall(r'\b\w*'+suffix+r'\b', text)
+    words = set()
+    for word in list:
+        words.add(word)
+    return words
 
 
 ###############################################################################
