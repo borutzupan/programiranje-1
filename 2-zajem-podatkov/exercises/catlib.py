@@ -71,12 +71,12 @@ def read_file_to_string(directory, filename):
 # Hint: To build this reg-ex, you can use your text editor's regex search
 # functionality.
 
-pattern = r'\b<div class="ad\s?featured?">.*?</div>\b'
-def page_to_ads(pattern, text):
-    '''Split "page" to a list of advertisement blocks.'''
-    for match in re.findall(pattern, text):
-        return print(match)
-    
+
+def page_to_ads(text):
+    regex = re.compile(
+        r'<div class="ad[ a-z]*?">(.*?)<div class="clear">', re.DOTALL
+        )
+    return [x.group(0) for x in re.finditer(regex, text)]
 
 
 # Define a function that takes a string corresponding to the block of one
@@ -84,10 +84,17 @@ def page_to_ads(pattern, text):
 # the description as displayed on the page.
 
 
-def get_dict_from_ad_block(TODO):
+def get_dict_from_ad_block(ad_block):
     '''Build a dictionary containing the name, description and price
     of an ad block.'''
-    return TODO
+    ad_name = re.compile(r'<h3><a title="(.*?)".*?>\1</a></h3>', re.DOTALL)
+    ad_desc = re.compile(r'</a></h3>\s+(.*?)\s+</?div>', re.DOTALL)
+    ad_price = re.compile(r'<div class="price">(<span>)?(?P<cena>.*?)(</span>)?</div>', re.DOTALL)
+    dictionary = {'name': re.search(ad_name, ad_block).group(1), 
+                  'description': re.search(ad_desc, ad_block).group(1),
+                  'price': re.search(ad_price, ad_block).groupdict()['cena']}
+    return dictionary
+
 
 # Write a function that reads a page from a file and returns the list of
 # dictionaries containing the information for each ad on that page.
@@ -123,3 +130,7 @@ def write_csv(fieldnames, rows, directory, filename):
 def write_cat_ads_to_csv(TODO):
     '''Write a CSV file containing one ad from "ads" on each row.'''
     return TODO
+
+
+l = page_to_ads(read_file_to_string(cat_directory, frontpage_filename))
+d = get_dict_from_ad_block(l[0])
