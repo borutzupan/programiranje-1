@@ -14,6 +14,18 @@
                 "quoting": "escape"
                 }
             ]
+        },
+        {
+            "label": "OCaml",
+            "type": "shell",
+            "command": "ocaml",
+            "args": [
+                "-init",
+                {
+                "value": "${file}",
+                "quoting": "escape"
+                }
+            ]
         }
     ]
 }
