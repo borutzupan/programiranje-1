@@ -106,11 +106,10 @@ let rec lepse_delete k = function
  - : int list = [1; 2; 3]
 [*----------------------------------------------------------------------------*)
 
-let rec slice i k = function
-  | [] -> failwith "List too short."
-  | x :: xs when i = 0 -> slice 0 (k-1)
-  | x :: xs when k = 1 -> list(x)
-  | x :: xs -> slice (i-1) (k-1)
+let rec slice i k list = 
+  let (_, slice1) = divide i list in 
+  let (slice2, _) = divide (k-1) slice1 in
+  slice2
 
 (*----------------------------------------------------------------------------*]
  Funkcija [insert x k list] na [k]-to mesto seznama [list] vrine element [x].

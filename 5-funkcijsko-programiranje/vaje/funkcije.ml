@@ -16,7 +16,20 @@ let rec reverse = ()
  - : string list = []
 [*----------------------------------------------------------------------------*)
 
-let rec repeat = ()
+let rec repeat x n =
+  if n <= 0 then
+   []
+  else
+   x :: repeat x (n-1)
+
+let rec repeat_tail_recursion x n =
+  let rec repeat' x n acc =
+    if n <= 0 then
+      acc
+    else
+      let new_acc = x :: acc in
+      repeat' x (n-1) new_acc in
+      repeat' x n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [range] sprejme število in vrne seznam vseh celih števil od 0 do
@@ -27,7 +40,20 @@ let rec repeat = ()
  - : int list = [0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10]
 [*----------------------------------------------------------------------------*)
 
-let rec range = ()
+let rec range n =
+  if n < 0 then
+    []
+  else
+    (range (n - 1)) @ [n]
+
+let rec range_tr n =
+  let rec range' n acc = 
+    if n < 0 then
+      acc
+    else
+      range' (n - 1) (n :: acc)
+    in
+    range' n []
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map f list] sprejme seznam [list] oblike [x0; x1; x2; ...] in
@@ -39,7 +65,9 @@ let rec range = ()
  - : int list = [2; 3; 4; 5; 6]
 [*----------------------------------------------------------------------------*)
 
-let rec map = ()
+let rec map f = function
+  | [] -> []
+  | x :: xs -> f x :: map f xs
 
 (*----------------------------------------------------------------------------*]
  Funkcija [map_tlrec] je repno rekurzivna različica funkcije [map].
