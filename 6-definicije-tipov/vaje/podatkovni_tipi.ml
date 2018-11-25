@@ -5,6 +5,21 @@
  pojavijo, ko uvedemo različne valute.
  Oglejmo si dva pristopa k izboljšavi varnosti pri uporabi valut.
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
+type 'a option = None | Some of 'a
+
+type color =
+  | Red
+  | Blue
+  | Yellow
+  | RGB of int * int * int
+
+type 'a list =
+  | Empty (* [] *)
+  | Cons of 'a * 'a list (* x :: xs *)
+
+type 'a tree =
+  | Empty
+  | Node of 'a * 'a tree * 'a tree
 
 (*----------------------------------------------------------------------------*]
  Definirajte tipa [euro] in [dollar], kjer ima vsak od tipov zgolj en
@@ -21,7 +36,21 @@
  - : euro = Euro 0.4305
 [*----------------------------------------------------------------------------*)
 
+type euro = Euro of float
+type dollar = Dollar of float
 
+let dollar_to_euro_bad dollar = 0.2 *. dollar
+
+let dollar_to_euro_good dollar = 
+  match dollar with
+  | Dollar v -> Euro (0.2 *. v)
+
+(*
+  let Dollar v = dollar in ...
+  
+  let d_to_e (Dollar v) 
+  
+*)
 
 (*----------------------------------------------------------------------------*]
  Definirajte tip [currency] kot en vsotni tip z konstruktorji za jen, funt
@@ -35,7 +64,16 @@
  - : currency = Pound 0.007
 [*----------------------------------------------------------------------------*)
 
-
+type currency =
+  | Yen of float
+  | Pound of float
+  | Krona of float
+  
+let to_pound c =
+  match c with
+  | Yen v -> Pound (0.00689789865 *. v)
+  | Pound v -> Pound v
+  | Krona v -> Pound (0.086364181 *. v)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Želimo uporabljati sezname, ki hranijo tako cela števila kot tudi logične
@@ -57,7 +95,12 @@
  Nato napišite testni primer, ki bi predstavljal "[5; true; false; 7]".
 [*----------------------------------------------------------------------------*)
 
+type intbool_list =
+  | Empty
+  | Int_value of int * intbool_list
+  | Bool_value of bool * intbool_list
 
+let test = Int_value (5, Bool_value (true, Bool_value (false, Int_value (7, Empty))))
 
 (*----------------------------------------------------------------------------*]
  Funkcija [intbool_map f_int f_bool ib_list] preslika vrednosti [ib_list] v nov
@@ -65,14 +108,47 @@
  oz. [f_bool].
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_map = ()
+let rec map f = function
+  | [] -> []
+  | x :: xs -> (f x) :: map f xs
 
+(*
+  let rec map_ugly f = function
+  | Empty -> Empty
+  | Cons(x, xs) -> Cons(f x, map_ugly f xs)
+*)
+let rec intbool_map (f_int: int -> int) (f_bool: bool -> bool) ib_list =
+  match ib_list with
+  | Empty -> Empty
+  | Int_value(i, tail) -> Int_value(f_int i, intbool_map f_int f_bool tail)
+  | Bool_value(b, tail) -> Bool_value(f_bool b, intbool_map f_int f_bool tail)
+
+let test_ib_map = intbool_map succ not test;;
 (*----------------------------------------------------------------------------*]
  Funkcija [intbool_reverse] obrne vrstni red elementov [intbool_list] seznama.
  Funkcija je repno rekurzivna.
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_reverse = ()
+let rec intbool_reverse ib_list =
+  let rec reverse' (acc: intbool_list) = function
+  | Empty -> acc
+  | Int_value(i, tail) -> reverse' (Int_value(i, acc)) tail
+  | Bool_value(b, tail) -> reverse' (Bool_value(b, acc)) tail in
+  reverse' Empty ib_list
+
+(*
+let rec intbool_reverse ib_list =
+  let rec reverse' (acc: intbool_list) = function
+  | Empty -> acc
+  | Int_value(i, ib_tail) -> 
+      let new_acc = Int_value(i, acc) in
+      reverse' new_acc ib_tail
+  | Bool_value(b, ib_tail) ->
+      let new_acc = Bool_value(b, acc) in
+      reverse' new_acc ib_tail
+  in
+  reverse' Empty ib_list
+*)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [intbool_separate ib_list] loči vrednosti [ib_list] v par [list]
@@ -80,8 +156,20 @@ let rec intbool_reverse = ()
  vrednosti. Funkcija je repno rekurzivna in ohranja vrstni red elementov.
 [*----------------------------------------------------------------------------*)
 
-let rec intbool_separate = ()
+let rec reverse list =
+  let rec reverse' acc = function
+    | [] -> acc
+    | x :: xs -> reverse' (x :: acc) xs
+  in
+  reverse' [] list
 
+let rec intbool_separate ib_list =
+  let rec seperate' int_acc bool_acc = function
+  | Empty -> (reverse int_acc, reverse bool_acc)
+  | Int_value (i, tail) -> seperate' (i :: int_acc) bool_acc tail
+  | Bool_value (b, tail) -> seperate' int_acc (b :: bool_acc) tail
+  in 
+  seperate' [] [] ib_list
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  Določeni ste bili za vzdrževalca baze podatkov za svetovno priznano čarodejsko
  akademijo "Effemef". Vaša naloga je konstruirati sistem, ki bo omogočil
@@ -98,7 +186,15 @@ let rec intbool_separate = ()
  [specialisation], ki loči med temi zaposlitvami.
 [*----------------------------------------------------------------------------*)
 
+type magic =
+  | Fire
+  | Frost
+  | Arcane
 
+type specialisation =
+  | Historian
+  | Teacher
+  | Researcher
 
 (*----------------------------------------------------------------------------*]
  Vsak od čarodejev začne kot začetnik, nato na neki točki postane študent,
@@ -115,7 +211,14 @@ let rec intbool_separate = ()
  - : wizard = {name = "Matija"; status = Employed (Fire, Teacher)}
 [*----------------------------------------------------------------------------*)
 
+type status =
+  | Newbie
+  | Student of magic * int
+  | Employed of magic * specialisation
 
+type wizard = {name: string; status: status}
+
+let professor = {name = "Matija"; status = Employed (Fire, Teacher)}
 
 (*----------------------------------------------------------------------------*]
  Želimo prešteti koliko uporabnikov posamezne od vrst magije imamo na akademiji.
