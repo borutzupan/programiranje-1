@@ -241,15 +241,7 @@ let professor = {name = "Matija"; status = Employed (Fire, Teacher)}
  - : magic_counter = {fire = 3; frost = 0; arcane = 0}
 [*----------------------------------------------------------------------------*)
 
-let count_magic wizard_list =
-  let rec count counter = function
-    | [] -> counter
-    | {name; status} :: wizards -> (
-        match status with
-        | Newbie -> count counter wizards
-        | Student (magic, _) -> count (update counter magic) wizards
-        | Employed (magic, _) -> count (update counter magic) wizards)
-in count {fire = 0; frost = 0; arcane = 0} wizard_list
+let rec count_magic = ()
 
 (*----------------------------------------------------------------------------*]
  Želimo poiskati primernega kandidata za delovni razpis. Študent lahko postane
@@ -265,18 +257,4 @@ in count {fire = 0; frost = 0; arcane = 0} wizard_list
  - : string option = Some "Jaina"
 [*----------------------------------------------------------------------------*)
 
-let find_candidate magic specialisation wizard_list =
-  let year =
-    match specialisation with
-    | Historian -> 3
-    | Researcher -> 4
-    | Teacher -> 5
-  in
-  let rec search = function
-    | [] -> None
-    | {name; status} :: wizards ->
-        match status with
-        | Student (m, y) when m = magic && y >= year -> Some name
-        | _ -> search wizards
-  in
-search wizard_list
+let rec find_candidate = ()
