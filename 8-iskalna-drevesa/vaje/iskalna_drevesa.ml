@@ -196,6 +196,7 @@ let member2 i tree =
 [*----------------------------------------------------------------------------*)
 
 
+
 (*----------------------------------------------------------------------------*]
  Na predavanjih ste omenili dva načina brisanja elementov iz drevesa. Prvi 
  uporablja [succ], drugi pa [pred]. Funkcija [delete x bst] iz drevesa [bst] 
