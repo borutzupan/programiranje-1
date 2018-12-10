@@ -177,10 +177,10 @@ let rec member i = function
  funkcije [member2] na drevesu z n vozlišči, ki ima globino log(n). 
 [*----------------------------------------------------------------------------*)
 
-let member2 i tree =
+let member2 n tree =
   match tree with
   | Empty -> false
-  | Node(lt, x, rt) -> List.mem i (list_of_tree tree)
+  | Node(lt, x, rt) -> member n lt || n = x || member n rt
 
 (*----------------------------------------------------------------------------*]
  Funkcija [succ] vrne naslednjika korena danega drevesa, če obstaja. Za drevo
@@ -195,7 +195,23 @@ let member2 i tree =
  - : int option = None
 [*----------------------------------------------------------------------------*)
 
+let rec min = function
+    | Empty -> None
+    | Node(Empty, x, _) -> Some x
+    | Node(lt, _, _) -> min lt
 
+let rec max = function
+    | Empty -> None
+    | Node(_, x, Empty) -> Some x
+    | Node(_, _, rt) -> max rt
+
+let succ = function
+    | Empty -> None
+    | Node(_, _, rt) -> min rt
+
+let pred = function
+    | Empty -> None
+    | Node(lt, _, _) -> max lt
 
 (*----------------------------------------------------------------------------*]
  Na predavanjih ste omenili dva načina brisanja elementov iz drevesa. Prvi 
@@ -209,7 +225,27 @@ let member2 i tree =
  Node (Node (Node (Empty, 0, Empty), 2, Empty), 5,
  Node (Node (Empty, 6, Empty), 11, Empty))
 [*----------------------------------------------------------------------------*)
-
+(*        5
+         / \
+        2   7
+       /   / \
+      0   6  11
+*)
+let rec delete i tree =
+    match tree with
+    | Empty -> (* Empty case *)Empty
+    | Node(Empty, x, Empty) when i = x -> (* leaf case *) Empty 
+    | Node(Empty, x, rt) when i = x -> (* one sided *) rt
+    | Node(lt, x, Empty) when i = x -> (* one sided *) lt
+    | Node(lt, x, rt) when i <> x -> (* recurse deeper *)
+        if i > x then
+            Node(lt, x, delete i rt)
+        else
+            Node(delete i lt, x, rt)
+    | Node(lt, x, rt) -> 
+        match succ tree with
+        | None -> failwith "How is this possible?!" (* this can not happen *) (* smo že pokrili ta primer Node(Empty, x, rt) *)
+        | Some z -> Node(lt, z, delete z rt)
 
 (*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*]
  SLOVARJI
@@ -222,6 +258,7 @@ let member2 i tree =
  vrednosti, ga parametriziramo kot [('key, 'value) dict].
 [*-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*)
 
+type ('key, 'value) dict = 'key * 'value tree
 
 (*----------------------------------------------------------------------------*]
  Napišite testni primer [test_dict]:
@@ -232,6 +269,10 @@ let member2 i tree =
      "c":-2
 [*----------------------------------------------------------------------------*)
 
+let test_dict = 
+    let left_tree = leaf ("a", 0) in
+    let right_tree = Node(leaf ("c", (-2)), ("d", 2), Empty) in
+    Node(left_tree, ("b", 1), right_tree)
 
 (*----------------------------------------------------------------------------*]
  Funkcija [dict_get key dict] v slovarju poišče vrednost z ključem [key]. Ker
@@ -243,6 +284,12 @@ let member2 i tree =
  - : int option = Some (-2)
 [*----------------------------------------------------------------------------*)
 
+let rec dict_get key dict =
+    match dict with
+    | Empty -> None
+    | Node(ld, (k, v), rd) when key = k -> Some v
+    | Node(_, (k, _), rd) when key > k -> dict_get key rd
+    | Node(ld, (k, _), _) (* when key < k *) -> dict_get key ld
       
 (*----------------------------------------------------------------------------*]
  Funkcija [print_dict] sprejme slovar s ključi tipa [string] in vrednostmi tipa
@@ -260,6 +307,9 @@ let member2 i tree =
  - : unit = ()
 [*----------------------------------------------------------------------------*)
 
+let print_dict = function
+    | Empty -> failwith "There is nothing to print!"
+    | Node(ld, (k, v), rd) -> print_string k " : " print_int v
 
 (*----------------------------------------------------------------------------*]
  Funkcija [dict_insert key value dict] v slovar [dict] pod ključ [key] vstavi
