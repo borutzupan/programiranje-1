@@ -231,7 +231,12 @@ let professor = {name = "Matija"; status = Employed (Fire, Teacher)}
  - : magic_counter = {fire = 1; frost = 1; arcane = 2}
 [*----------------------------------------------------------------------------*)
 
+type magic_counter = {fire: int; frost: int; arcane: int}
 
+let update counter = function
+  | Fire -> {counter with fire = counter.fire + 1}
+  | Frost -> {counter with frost = counter.frost + 1}
+  | Arcane -> {counter with arcane = counter.arcane + 1}
 
 (*----------------------------------------------------------------------------*]
  Funkcija [count_magic] sprejme seznam čarodejev in vrne števec uporabnikov
@@ -241,7 +246,17 @@ let professor = {name = "Matija"; status = Employed (Fire, Teacher)}
  - : magic_counter = {fire = 3; frost = 0; arcane = 0}
 [*----------------------------------------------------------------------------*)
 
-let rec count_magic = ()
+let rec count_magic wizard_list = 
+  let rec count counter = function
+    | [] -> counter
+    | {name, status} :: wizards -> (
+      match status with
+      | Newbie -> count counter wizards
+      | Student (magic, _) -> count (update counter magic) wizards
+      | Emplyed (magic, _) -> count (update counter magic) wizards
+      in
+      count {fire = 0; frost = 0; arcane = 0} wizard_list
+
 
 (*----------------------------------------------------------------------------*]
  Želimo poiskati primernega kandidata za delovni razpis. Študent lahko postane
